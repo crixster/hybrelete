@@ -512,6 +512,8 @@
                     fb.connect(delay);
                     delay.connect(this.bus);
 
+                    this.initMenu();
+
                     // shared noise for drums
                     this.noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate);
                     const d = this.noiseBuf.getChannelData(0);
@@ -565,7 +567,7 @@
                 o.stop(t + dur + 0.02);
             }
 
-            noise(t, dur, freq, type, vol) {
+            noise(t, dur, freq, type, vol, dest = this.bus) {
                 const c = this.ctx;
                 const src = c.createBufferSource();
                 src.buffer = this.noiseBuf;
@@ -577,33 +579,33 @@
                 g.gain.exponentialRampToValueAtTime(0.001, t + dur);
                 src.connect(f);
                 f.connect(g);
-                g.connect(this.bus);
+                g.connect(dest);
                 src.start(t, Math.random() * 0.5);
                 src.stop(t + dur + 0.01);
             }
 
-            kick(t) {
+            kick(t, dest = this.bus, v = 1) {
                 const c = this.ctx;
                 const o = c.createOscillator();
                 const g = c.createGain();
                 o.type = 'sine';
                 o.frequency.setValueAtTime(160, t);
                 o.frequency.exponentialRampToValueAtTime(45, t + 0.12);
-                g.gain.setValueAtTime(0.7, t);
+                g.gain.setValueAtTime(0.7 * v, t);
                 g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
                 o.connect(g);
-                g.connect(this.bus);
+                g.connect(dest);
                 o.start(t);
                 o.stop(t + 0.2);
             }
 
-            snare(t, vol = 0.34) {
-                this.noise(t, 0.14, 1400, 'highpass', vol);
-                this.tone(190, t, 0.08, 'triangle', vol * 0.6, this.bus);
+            snare(t, vol = 0.34, dest = this.bus) {
+                this.noise(t, 0.14, 1400, 'highpass', vol, dest);
+                this.tone(190, t, 0.08, 'triangle', vol * 0.6, dest);
             }
 
-            hat(t, open) {
-                this.noise(t, open ? 0.13 : 0.035, 7000, 'highpass', open ? 0.1 : 0.08);
+            hat(t, open, dest = this.bus, v = 1) {
+                this.noise(t, open ? 0.13 : 0.035, 7000, 'highpass', (open ? 0.1 : 0.08) * v, dest);
             }
 
             scheduleStep(idx, t, sd) {
@@ -780,6 +782,140 @@
                 this.tone(this.mtof(48), tc, 1.1, 'triangle', 0.25, this.comp);
             }
         }
+
+                // ==========================================
+        // 2b. MENU MUSIC: one chiptune theme per screen (Field / Gym HQ / Pro Shop)
+        // ==========================================
+        const NOARP = Array(16).fill(null);
+        const MENU_TRACKS = {
+            // THE FIELD - sunny G-major jog: plucky pulse lead, 8th-note arps, walking triangle bass, brushed backbeat
+            field: { name: 'FIELD DAY', bpm: 116, tr: [0, 2], lw: 0.25, lv: 0.07, gate: 0.9, vib: true, delay: 0.26,
+              mel: [
+                [[79,4],[83,2],[81,2],[79,4],[74,4]],
+                [[76,4],[79,2],[83,2],[81,6],[0,2]],
+                [[84,4],[83,2],[81,2],[79,4],[76,4]],
+                [[78,2],[81,2],[86,4],[85,2],[86,2],[0,4]],
+                [[79,2],[83,2],[86,4],[83,2],[79,2],[83,4]],
+                [[78,4],[81,2],[86,2],[85,4],[81,4]],
+                [[84,2],[88,2],[91,4],[88,2],[84,2],[79,4]],
+                [[81,4],[78,4],[74,4],[78,2],[81,2]]],
+              chords: [[55,59,62],[52,55,59],[55,60,64],[57,62,66],[55,59,62],[54,59,62],[55,60,64],[57,62,66]],
+              bass: [43,40,36,38,43,47,36,38],
+              bassPat: [0,null,null,null, 7,null,null,null, 12,null,null,null, 7,null,null,null], bassW: 'triangle', bassV: 0.2,
+              arp: [0,null,1,null, 2,null,1,null, 0,null,1,null, 2,null,3,null], arpDuty: 0.125, arpV: 0.028, arpLen: 1.6,
+              drums: { k: [0,8], kv: 0.35, s: [12], sv: 0.1, h: '8', hv: 0.5 } },
+
+            // GYM HQ - A-minor training montage: staccato saw-ish riff, pumping bass, off-beat stabs, four-on-the-floor
+            gym: { name: 'IRON HQ', bpm: 128, tr: [0, 3], lw: 0.375, lv: 0.06, gate: 0.55, vib: false, delay: 0.14,
+              mel: [
+                [[81,2],[0,2],[81,2],[84,2],[0,2],[83,2],[81,4]],
+                [[77,2],[0,2],[77,2],[81,2],[0,2],[79,2],[77,4]],
+                [[84,2],[0,2],[84,2],[88,2],[0,2],[86,2],[84,4]],
+                [[83,2],[0,2],[83,2],[86,2],[0,2],[84,2],[83,4]],
+                [[88,2],[0,2],[88,2],[84,2],[0,2],[81,2],[84,4]],
+                [[89,2],[0,2],[89,2],[84,2],[0,2],[81,2],[77,4]],
+                [[86,2],[83,2],[86,2],[91,2],[0,2],[88,2],[86,4]],
+                [[88,2],[0,2],[88,2],[83,2],[0,2],[80,2],[83,2],[88,2]]],
+              chords: [[57,60,64],[53,57,60],[55,60,64],[55,59,62],[57,60,64],[53,57,60],[55,59,62],[56,59,64]],
+              bass: [45,41,36,43,45,41,43,40],
+              bassPat: [0,null,0,0, 12,null,0,null, 0,null,0,0, 12,null,7,null], bassW: 'sawtooth', bassV: 0.09,
+              arp: NOARP, arpDuty: 0.25, arpV: 0, arpLen: 1,
+              stab: { s: [2,6,10,14], duty: 0.25, v: 0.022, len: 1.6 }, roll: true,
+              drums: { k: [0,4,8,12], kv: 0.55, s: [4,12], sv: 0.22, h: 'off', hv: 0.7 } },
+
+            // PRO SHOP - F-major bossa lounge: warm triangle lead, jazzy 7th-chord comping on a clave, bossa bass, rim clicks
+            shop: { name: 'SHOPPING SPREE', bpm: 98, tr: [0, 2], lw: 'triangle', lv: 0.13, gate: 0.85, vib: true, delay: 0.31,
+              mel: [
+                [[81,3],[84,3],[88,2],[84,4],[0,4]],
+                [[86,3],[84,3],[81,2],[77,4],[0,4]],
+                [[82,3],[86,3],[89,2],[86,4],[0,4]],
+                [[88,2],[84,2],[82,2],[79,2],[76,4],[0,4]],
+                [[84,3],[88,3],[91,2],[89,4],[0,4]],
+                [[89,3],[86,3],[82,2],[86,4],[0,4]],
+                [[91,3],[89,3],[86,2],[82,4],[0,4]],
+                [[84,2],[82,2],[79,2],[76,2],[77,4],[0,4]]],
+              chords: [[53,57,60,64],[50,53,57,60],[55,58,62,65],[52,55,58,60],[53,57,60,64],[58,62,65,69],[55,58,62,65],[52,55,58,60]],
+              bass: [41,38,43,36,41,46,43,36],
+              bassPat: [0,null,null,null, null,null,7,null, 0,null,null,null, null,null,7,null], bassW: 'triangle', bassV: 0.2,
+              arp: [null,null,null,null, null,null,null,null, 7,null,null,null, null,null,null,null], arpDuty: 0.5, arpV: 0.022, arpLen: 2,
+              stab: { s: [0,3,6,10,12], duty: 0.125, v: 0.02, len: 1.4 },
+              drums: { k: [0,8], kv: 0.3, s: [], sv: 0, rim: [0,3,6,10,12], h: '16', hv: 0.25 } }
+        };
+        Object.values(MENU_TRACKS).forEach(T => {
+            T.bassLen = T.bassPat.map((v, i) => { if (v === null) return 0; let d = 1; while (d < 4 && T.bassPat[(i + d) % 16] === null) d++; return d * 0.9; });
+            const m = {}; T.mel.forEach((bar, b) => { let st = b * 16; bar.forEach(([n, l]) => { if (n) m[st] = [n, l]; st += l; }); }); T.melody = m;
+        });
+
+        Object.assign(SoundEngine.prototype, {
+            initMenu() {
+                const c = this.ctx;
+                this.menuTok = 0; this.menuKey = null; this.menuTimer = null;
+                this.menuBus = c.createGain(); this.menuBus.gain.value = 0; this.menuBus.connect(this.comp);
+                this.menuLead = c.createGain(); this.menuLead.connect(this.menuBus);
+                const send = c.createGain(); send.gain.value = 0.28;
+                this.menuDelay = c.createDelay(1.0);
+                const fb = c.createGain(); fb.gain.value = 0.3;
+                this.menuLead.connect(send); send.connect(this.menuDelay);
+                this.menuDelay.connect(fb); fb.connect(this.menuDelay); this.menuDelay.connect(this.menuBus);
+            },
+            // Called on every screen change: roster = THE FIELD, gym = GYM HQ, shop = PRO SHOP, anything else = silence
+            setScene(n) {
+                this.scene = n;
+                if (!this.ctx) return;
+                const key = { roster: 'field', gym: 'gym', shop: 'shop' }[n] || null;
+                if (key && key === this.menuKey && this.menuTimer) return;
+                this.menuKey = key;
+                const wait = this.menuTimer ? 260 : 0, tok = ++this.menuTok;
+                if (this.menuTimer) { clearInterval(this.menuTimer); this.menuTimer = null; }
+                const now = this.ctx.currentTime;
+                this.menuBus.gain.cancelScheduledValues(now);
+                this.menuBus.gain.setTargetAtTime(0, now, 0.07);
+                if (!key || isMuted) return;
+                if (wait) setTimeout(() => { if (tok === this.menuTok) this.startMenu(key); }, wait);
+                else this.startMenu(key);
+            },
+            startMenu(key) {
+                const c = this.ctx, now = c.currentTime;
+                this.mt = MENU_TRACKS[key];
+                this.menuDelay.delayTime.value = this.mt.delay;
+                this.menuStep = 0; this.menuNext = now + 0.08;
+                this.menuBus.gain.cancelScheduledValues(now);
+                this.menuBus.gain.setValueAtTime(0.0001, now);
+                this.menuBus.gain.linearRampToValueAtTime(0.6, now + 0.5);
+                this.menuTimer = setInterval(() => this.pumpMenu(), 25);
+            },
+            stopMenu() {
+                this.menuTok++; this.menuKey = null;
+                if (this.menuTimer) { clearInterval(this.menuTimer); this.menuTimer = null; }
+                if (this.menuBus) { const now = this.ctx.currentTime; this.menuBus.gain.cancelScheduledValues(now); this.menuBus.gain.setTargetAtTime(0, now, 0.04); }
+            },
+            resumeMenu() { if (this.scene) this.setScene(this.scene); },
+            pumpMenu() {
+                const c = this.ctx;
+                if (this.menuNext < c.currentTime - 0.5) this.menuNext = c.currentTime + 0.05; // tab was throttled; don't burst-schedule
+                while (this.menuNext < c.currentTime + 0.15) {
+                    const sd = 60 / this.mt.bpm / 4;
+                    this.scheduleMenu(this.menuStep, this.menuNext, sd);
+                    this.menuNext += sd; this.menuStep++;
+                }
+            },
+            scheduleMenu(idx, t, sd) {
+                const T = this.mt, D = T.drums, dst = this.menuBus;
+                const tr = T.tr[Math.floor(idx / 128) % T.tr.length], bar = Math.floor(idx / 16) % 8, st = idx % 16, ch = T.chords[bar];
+                const m = T.melody[idx % 128];
+                if (m) this.tone(this.mtof(m[0] + tr), t, m[1] * sd * T.gate, typeof T.lw === 'number' ? this.pulse(T.lw) : T.lw, T.lv, this.menuLead, T.vib && m[1] >= 4);
+                if (T.stab && T.stab.s.includes(st)) ch.forEach(n => this.tone(this.mtof(n + tr), t, sd * T.stab.len, this.pulse(T.stab.duty), T.stab.v, dst));
+                const ai = T.arp[st];
+                if (ai !== null) this.tone(this.mtof(ch[ai % ch.length] + 12 * Math.floor(ai / ch.length) + tr), t, sd * T.arpLen, this.pulse(T.arpDuty), T.arpV, dst);
+                const bo = T.bassPat[st];
+                if (bo !== null) this.tone(this.mtof(T.bass[bar] + tr + bo), t, sd * T.bassLen[st], T.bassW, T.bassV, dst);
+                if (D.k.includes(st)) this.kick(t, dst, D.kv);
+                if (D.s.includes(st)) this.snare(t, D.sv, dst);
+                if (D.rim && D.rim.includes(st)) this.noise(t, 0.03, 2600, 'highpass', 0.07, dst);
+                if (D.h === '16' || (D.h === '8' && st % 2 === 0) || (D.h === 'off' && st % 4 === 2)) this.hat(t, false, dst, D.hv);
+                if (T.roll && bar === 7 && st >= 12) this.snare(t, 0.1 + (st - 12) * 0.05, dst);
+            }
+        });
 
         const sound = new SoundEngine();
         sound.BPM = 156;
@@ -1160,6 +1296,7 @@
         // ---- screens & modal ----
         function showScreen(n) {
             SCREENS.forEach(s => document.getElementById('screen-' + s).classList.toggle('hidden', s !== n));
+            sound.setScene(n);
             hideModal();
             if (n !== 'gym') { gym.active = false; if (gym.raf) cancelAnimationFrame(gym.raf); }
             if (n !== 'podium' && podiumFrameId) { cancelAnimationFrame(podiumFrameId); podiumFrameId = null; }
@@ -2891,10 +3028,10 @@
             isMuted = !isMuted;
             const textSpan = document.getElementById('audio-status-text');
             if (isMuted) {
-                textSpan.innerText = "OFF";
+                textSpan.innerText = "OFF"; sound.stopMenu();
                 sound.stopBGM();
             } else {
-                textSpan.innerText = "ON";
+                textSpan.innerText = "ON"; sound.resumeMenu();
                 if (isRacing) sound.startRaceBGM();
             }
         };

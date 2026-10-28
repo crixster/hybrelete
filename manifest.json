@@ -1,0 +1,21 @@
+{
+  "name": "Hybrelete: The Hybrid Athlete Racing Simulator",
+  "short_name": "Hybrelete",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#08090d",
+  "theme_color": "#08090d",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxOTInIGhlaWdodD0nMTkyJz48cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBmaWxsPScjMDgwOTBkJy8+PHJlY3QgeD0nNDgnIHk9JzQ4JyB3aWR0aD0nOTYnIGhlaWdodD0nOTYnIGZpbGw9JyNmYWNjMTUnLz48L3N2Zz4=",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc1MTInIGhlaWdodD0nNTEyJz48cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBmaWxsPScjMDgwOTBkJy8+PHJlY3QgeD0nMTI4JyB5PScxMjgnIHdpZHRoPScyNTYnIGhlaWdodD0nMjU2JyBmaWxsPScjZmFjYzE1Jy8+PC9zdmc+",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

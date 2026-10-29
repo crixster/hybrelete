@@ -146,6 +146,7 @@
                     <div class="flex flex-wrap gap-2">
                         <button id="gym-back-btn" class="bg-gray-800 hover:bg-gray-700 text-teal-300 border border-teal-600 text-[10px] px-3 py-2 rounded pixel-font arcade-btn">THE FIELD</button>
                         <button id="gym-shop-btn" class="bg-gray-800 hover:bg-gray-700 text-pink-300 border border-pink-600 text-[10px] px-3 py-2 rounded pixel-font arcade-btn">🛒 PRO SHOP</button>
+                        <button id="gym-career-btn" class="bg-gray-800 hover:bg-gray-700 text-yellow-300 border border-yellow-600 text-[10px] px-3 py-2 rounded pixel-font arcade-btn">🏆 CAREER</button>
                         <button id="advance-btn" class="bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-black font-black text-[10px] px-3 py-2 rounded pixel-font arcade-btn">ADVANCE DAY ⏩</button>
                     </div>
                 </div>
@@ -169,6 +170,15 @@
                     <div class="lg:w-[380px] shrink-0 flex flex-col gap-2">
                         <canvas id="gym-canvas" width="360" height="200" class="w-full border-2 border-teal-700 rounded bg-black"></canvas>
                         <div id="gym-caption" class="pixel-font text-[9px] text-teal-300 min-h-[14px]"></div>
+                        <div id="strain-badge" class="hidden pixel-font text-[9px] bg-red-800 text-white px-2 py-1 rounded"></div>
+                        <div class="bg-gray-900 border border-gray-800 rounded p-2">
+                            <div class="pixel-font text-[9px] text-yellow-400 mb-1">DAILY SERVICES <span class="text-gray-500">(1 each per day, no actions used)</span></div>
+                            <div id="services" class="grid grid-cols-2 gap-1.5"></div>
+                        </div>
+                        <div class="bg-gray-900 border border-gray-800 rounded p-2">
+                            <div class="pixel-font text-[9px] text-yellow-400 mb-1">SPONSOR CONTRACTS</div>
+                            <div id="contracts" class="flex flex-col gap-1.5"></div>
+                        </div>
                         <div class="bg-gray-900 border border-gray-800 rounded p-2 text-[12px] leading-tight text-gray-300 space-y-1">
                             <div class="pixel-font text-[9px] text-yellow-400 mb-1">CARE MENU</div>
                             <div>🏋️ <b class="text-white">HEAVY SLED &amp; LIFT</b> +2 STR (+3 w/ Dumbbells), +25 FAT, -5 MOR</div>
@@ -205,7 +215,14 @@
                         <canvas id="shop-canvas" width="200" height="140" class="w-full border-2 border-pink-700 rounded bg-black"></canvas>
                         <div id="shop-msg" class="pixel-font text-[9px] text-pink-300 min-h-[26px] leading-relaxed">WELCOME, ATHLETE!</div>
                     </div>
-                    <div id="shop-grid" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 flex-1 content-start"></div>
+                    <div class="flex-1 flex flex-col gap-2">
+                        <div class="flex gap-2">
+                            <button id="tab-gear" class="arcade-btn pixel-font text-[9px] px-3 py-2 rounded">🛍️ GEAR</button>
+                            <button id="tab-fac" class="arcade-btn pixel-font text-[9px] px-3 py-2 rounded">🏢 FACILITY / STAFF</button>
+                            <button id="tab-kits" class="arcade-btn pixel-font text-[9px] px-3 py-2 rounded">🥷 MOVE KITS</button>
+                        </div>
+                        <div id="shop-grid" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 content-start"></div>
+                    </div>
                 </div>
             </div>
 
@@ -242,6 +259,17 @@
                             <button class="speed-btn bg-gray-800 text-white hover:bg-gray-700 px-2 py-0.5 rounded text-[9px] pixel-font" data-speed="2">2X</button>
                             <button class="speed-btn bg-gray-800 text-white hover:bg-gray-700 px-2 py-0.5 rounded text-[9px] pixel-font" data-speed="4">4X</button>
                         </div>
+                    </div>
+
+                    <!-- TACTICS: meter + special moves -->
+                    <div id="tactics-hud" class="flex flex-wrap items-center gap-2 pb-1 border-b border-gray-800">
+                        <span class="pixel-font text-[9px] text-gray-400">TACTICS</span>
+                        <div class="w-28 h-3 bg-gray-900 border border-gray-700 rounded-sm"><div id="meter-fill" class="h-full bg-gradient-to-r from-cyan-500 to-fuchsia-500" style="width:0%"></div></div>
+                        <button id="mv-adr" data-mv="ADR" class="arcade-btn pixel-font text-[8px] px-2 py-1.5 rounded bg-orange-600 text-white">⚡ SURGE 60 [1]</button>
+                        <button id="mv-talk" data-mv="TALK" class="arcade-btn pixel-font text-[8px] px-2 py-1.5 rounded bg-sky-700 text-white">🗣 TRASH TALK 30 [2]</button>
+                        <button id="mv-sab" data-mv="SAB" class="arcade-btn pixel-font text-[8px] px-2 py-1.5 rounded bg-red-700 text-white">🥷 SHOVE 50 [3]</button>
+                        <span id="kit-btns" class="contents"></span>
+                        <div id="move-toast" class="w-full min-h-[14px] pixel-font text-[9px] text-yellow-300"></div>
                     </div>
 
                     <!-- TELEMETRY BARS -->
@@ -282,6 +310,26 @@
             </div>
 
             <!-- GENERIC MODAL -->
+            <div id="career" class="hidden absolute inset-0 z-50 bg-black/90 flex items-start sm:items-center justify-center p-3 overflow-y-auto">
+                <div class="bg-gray-900 border-4 border-yellow-500 rounded p-4 max-w-xl w-full">
+                    <div class="flex justify-between items-center mb-2"><h3 class="pixel-font text-yellow-400 text-sm">🏆 CAREER</h3><button id="career-close" class="bg-gray-800 text-teal-300 border border-teal-600 text-[10px] px-3 py-1.5 rounded pixel-font arcade-btn">CLOSE</button></div>
+                    <div id="career-body" class="text-[15px] text-gray-300 space-y-3"></div>
+                </div>
+            </div>
+            <div id="tactics" class="hidden absolute inset-0 z-50 bg-black/90 flex items-start sm:items-center justify-center p-3 overflow-y-auto">
+                <div class="bg-gray-900 border-4 border-yellow-500 rounded p-4 max-w-lg w-full">
+                    <h3 class="pixel-font text-yellow-400 text-sm mb-1">📋 RACE TACTICS</h3>
+                    <p id="tac-sub" class="text-gray-400 text-base mb-3 leading-tight"></p>
+                    <div class="pixel-font text-[9px] text-teal-300 mb-1">PACING STRATEGY</div>
+                    <div id="tac-pace" class="grid gap-2 mb-3"></div>
+                    <div class="pixel-font text-[9px] text-teal-300 mb-1">PRE-RACE CONSUMABLES</div>
+                    <div id="tac-cons" class="grid gap-2 mb-3"></div>
+                    <div class="flex justify-between items-center gap-2">
+                        <span id="tac-cash" class="pixel-font text-[10px] text-emerald-400"></span>
+                        <button id="tac-go" class="bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black text-xs px-5 py-2.5 rounded pixel-font arcade-btn">START RACE ▶</button>
+                    </div>
+                </div>
+            </div>
             <div id="modal" class="hidden absolute inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
                 <div class="bg-gray-900 border-4 border-yellow-500 rounded p-5 max-w-md w-full text-center">
                     <h3 id="modal-title" class="pixel-font text-yellow-400 text-sm mb-3 leading-relaxed"></h3>
@@ -981,7 +1029,7 @@
             const lvl = Math.max(0.3, 1 - Math.max(0, cur - 80) / 100);
             const fat = a.fatigue > 85 ? 0.4 : a.fatigue > 70 ? 0.65 : 1;
             const mor = a.morale < 30 ? 0.75 : 1;
-            const g = base * lvl * fat * mor, w = Math.floor(g);
+            const g = base * lvl * fat * mor * (a.strain > 0 ? 0.5 : 1), w = Math.floor(g);
             return w + (Math.random() < g - w ? 1 : 0);
         }
 
@@ -995,14 +1043,14 @@
         const CARE_ACTIONS = {
             LIFT:  { emoji: '🏋️', short: 'LIFT',  name: 'HEAVY SLED & LIFT',   apply(a) {
                 const db = a.isPlayer && !!gearOf().dumbbells;      // Titanium Dumbbells: +1 base STR
-                a.strength = capStat(a.strength + trainGain(a, a.strength, db ? 3 : 2));
-                a.fatigue = clamp100(a.fatigue + 25); a.morale = clamp100(a.morale - 5); a.fitness = clamp100(a.fitness + 3); a.domsCleared = false; a.restCount = 0; } },
+                a.strength = capStat(a.strength + trainGain(a, a.strength, (db ? 3 : 2) + lv(a, 'ironracks')));
+                a.fatigue = clamp100(a.fatigue + (25 - (has(a, 'ironracks') ? 5 : 0) - 3 * Math.max(0, lv(a, 'ironracks') - 1))); a.morale = clamp100(a.morale - 5); a.fitness = clamp100(a.fitness + 3); a.domsCleared = false; a.restCount = 0; } },
             RUN:   { emoji: '🏃', short: 'RUN',   name: 'THRESHOLD TRACK RUN', apply(a) {
-                a.speed = capStat(a.speed + trainGain(a, a.speed, has(a, 'parachute') ? 3 : 2)); a.pace = capStat(a.pace + trainGain(a, a.pace, has(a, 'hrstrap') ? 3 : 2));
+                a.speed = capStat(a.speed + trainGain(a, a.speed, (has(a, 'parachute') ? 3 : 2) + lv(a, 'altitude'))); a.pace = capStat(a.pace + trainGain(a, a.pace, (has(a, 'hrstrap') ? 3 : 2) + lv(a, 'altitude')));
                 a.fatigue = clamp100(a.fatigue + 20); a.fitness = clamp100(a.fitness + 4); a.domsCleared = false; a.restCount = 0; } },
             // MEAL = mood & stamina food: big morale, small fitness gain, barely any recovery
             MEAL:  { emoji: '🥗', short: 'MEAL',  name: 'HIGH-PROTEIN MEAL',   apply(a) {
-                const sh = has(a, 'shaker'); a.morale = clamp100(a.morale + 20 + (sh ? 8 : 0)); a.fitness = clamp100(a.fitness + 3 + (sh ? 2 : 0) + Math.floor(Math.random() * 3)); a.fatigue = clamp100(a.fatigue - 5); } },
+                const sh = has(a, 'shaker'); a.morale = clamp100(a.morale + 20 + (sh ? 8 : 0) + (has(a, 'nutri') ? 6 : 0)); a.fitness = clamp100(a.fitness + 3 + (sh ? 2 : 0) + (has(a, 'nutri') ? 1 : 0) + Math.floor(Math.random() * 3)); a.fatigue = clamp100(a.fatigue - 5); } },
             // COACH = part-time job: cash now, tired legs later
             COACH: { emoji: '💼', short: 'COACH', name: 'PART-TIME COACHING',  apply(a) {
                 const pay = 90 + Math.floor(Math.random() * 61);
@@ -1013,13 +1061,25 @@
             // REST = pure recovery: no morale or fitness gain
             REST:  { emoji: '💤', short: 'REST',  name: 'FULL REST DAY',       apply(a) {
                 const cryo = !!gearOf().cryo && a.isPlayer;   // Cryo Tank: deeper recovery, no detraining
-                a.fatigue = clamp100(a.fatigue - ((cryo ? 70 : 50) + (has(a, 'roller') ? 10 : 0)));
+                a.fatigue = clamp100(a.fatigue - ((cryo ? 70 : 50) + (has(a, 'roller') ? 10 : 0) + (has(a, 'pool') ? 15 : 0) + 10 * Math.max(0, lv(a, 'pool') - 1)));
                 a.domsCleared = true;
-                a.restCount = (a.restCount || 0) + 1;
+                a.restCount = (a.restCount || 0) + 1; if (a.strain > 0) a.strain = Math.max(0, a.strain - 1);
                 if (!cryo && a.restCount > 2) { a.pace = capStat(a.pace - 1); a.strength = capStat(a.strength - 1); a.speed = capStat(a.speed - 1); a.fitness = clamp100(a.fitness - 2); } // detraining
             } }
         };
 
+        // Training while wrecked (FAT > 85) can cause a STRAIN: halved gains and -8% race speed for 2-4 days
+        ['LIFT', 'RUN'].forEach(k => {
+            const f = CARE_ACTIONS[k].apply;
+            CARE_ACTIONS[k].apply = function (a) {
+                const risk = a.isPlayer && a.fatigue > 85 && !(a.strain > 0), out = f.call(this, a);
+                if (risk && Math.random() < 0.2 * (career.owned.physio ? 0.5 : 1)) {
+                    a.strain = 2 + Math.floor(Math.random() * 3);
+                    setTimeout(() => setGymCaption(`🤕 STRAIN! ${a.strain} DAYS: GAINS HALVED, -8% SPEED`), 2500);
+                }
+                return out;
+            };
+        });
         const gym = { sel: null, action: null, t0: 0, raf: null, active: false };
 
         function gymMeter(label, val, bar, text) {
@@ -1030,6 +1090,7 @@
         }
 
         function renderGym() {
+            renderServices(); renderContracts();
             const grid = document.getElementById('gym-grid');
             grid.innerHTML = '';
             [player()].forEach(a => {
@@ -1137,6 +1198,58 @@
             m.forEach((row, j) => [...row].forEach((v, i) => { if (v === '1') ctx.fillRect(x + i * 2, y + j * 2, 2, 2); }));
         }
 
+        function drawGymExtras(ctx, now, GY) {
+            const G = gearOf(), R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); }, bl = Math.floor(now * 2) % 2;
+            if (G.sponsor) { R(266, 0, 2, 14, '#6b7280'); R(290, 0, 2, 14, '#6b7280'); R(262, 14, 34, 24, '#facc15'); R(262, 14, 34, 3, '#ca8a04'); R(268, 22, 22, 3, '#111827'); R(272, 29, 14, 3, '#111827'); }
+            if (G.altitude) {   // mountain poster + oxygen tent
+                R(8, 32, 28, 34, '#1e3a8a'); R(10, 34, 24, 30, '#7dd3fc'); ctx.fillStyle = '#475569'; ctx.beginPath(); ctx.moveTo(10, 64); ctx.lineTo(22, 40); ctx.lineTo(34, 64); ctx.fill(); R(19, 40, 6, 5, '#f8fafc');
+                R(56, 108, 20, 4, '#475569'); R(52, 112, 28, 38, '#475569'); R(54, 114, 24, 34, '#94a3b8'); R(58, 120, 16, 14, '#7dd3fc'); R(56, 138, 9, 8, '#0f172a'); R(58, 140, 3, 3, bl ? '#22c55e' : '#14532d');
+            }
+            if (G.ironracks) {  // power rack with plates
+                R(296, 88, 4, 62, '#4b5563'); R(350, 88, 4, 62, '#4b5563'); R(296, 88, 58, 4, '#4b5563'); R(296, 108, 58, 3, '#4b5563');
+                [['#1f2937', 302], ['#ef4444', 318], ['#1f2937', 334]].forEach(([c, x]) => R(x, 94, 10, 10, c));
+                R(298, 124, 54, 3, '#d1d5db'); R(298, 117, 4, 17, '#ef4444'); R(348, 117, 4, 17, '#ef4444');
+            }
+            if (G.pool) {       // plunge pool (foreground, animated ripples)
+                R(6, 160, 82, 32, '#e2e8f0'); R(9, 163, 76, 26, '#0ea5e9'); R(80, 156, 2, 12, '#9ca3af');
+                ctx.fillStyle = '#bae6fd'; for (let i = 0; i < 6; i++) ctx.fillRect(12 + i * 12 + Math.sin(now * 2 + i) * 3, 168 + (i % 2) * 9, 8, 2);
+            }
+            if (G.nutri) {      // smoothie bar
+                R(236, 170, 50, 22, '#78350f'); R(236, 166, 50, 5, '#d1a45f');
+                const sx = Math.sin(now * 22) * 0.6; R(246 + sx, 152, 10, 14, '#cbd5e1'); R(248 + sx, 155, 6, 9, '#f472b6'); R(246 + sx, 150, 10, 3, '#374151');
+                R(264, 160, 6, 6, '#ef4444'); R(273, 161, 6, 5, '#facc15');
+            }
+            if (G.physio) {     // massage table + therapist
+                R(294, 180, 60, 6, '#f1f5f9'); R(296, 186, 4, 10, '#6b7280'); R(348, 186, 4, 10, '#6b7280');
+                R(329, 156, 8, 8, '#fcd9b6'); R(327, 164, 12, 14, '#10b981'); R(323 + Math.sin(now * 6) * 3, 175, 5, 4, '#fcd9b6'); R(339 - Math.sin(now * 6) * 3, 175, 5, 4, '#fcd9b6');
+            }
+            if (G.merch) {      // jersey shelf; sign sparkles with fan count
+                R(300, 16, 58, 12, '#111827'); ctx.fillStyle = '#fbbf24'; ctx.font = "6px 'Press Start 2P', monospace"; ctx.fillText('MERCH', 306, 25);
+                R(304, 34, 50, 4, '#78350f'); R(304, 60, 50, 4, '#78350f');
+                ['#ef4444', '#3b82f6', '#facc15', '#22c55e'].forEach((c, i) => { R(306 + i * 12, 40, 10, 16, c); R(309 + i * 12, 40, 4, 3, '#f8fafc'); });
+                const n = Math.min(6, Math.floor((career.fans || 0) / 150));
+                for (let i = 0; i < n; i++) { ctx.globalAlpha = (Math.sin(now * 4 + i * 2) + 1) / 2; R(302 + (i * 9) % 52, 20 + (i * 7) % 40, 2, 2, '#fde047'); ctx.globalAlpha = 1; }
+            }
+            if (G.altitude2) { R(52, 112, 28, 2, '#fbbf24'); R(70, 138, 6, 8, '#0f172a'); R(72, 140, 2, 2, bl ? '#38bdf8' : '#082f49'); }
+            if (G.altitude3) { R(52, 148, 28, 2, '#fbbf24'); ctx.globalAlpha = (Math.sin(now * 5) + 1) / 2; R(60 + Math.sin(now * 2) * 8, 126, 2, 2, '#e0f2fe'); R(68, 118 + Math.cos(now * 3) * 4, 2, 2, '#e0f2fe'); ctx.globalAlpha = 1; }
+            if (G.ironracks2) { R(298, 136, 54, 3, '#d1d5db'); R(298, 130, 4, 15, '#3b82f6'); R(348, 130, 4, 15, '#3b82f6'); }
+            if (G.ironracks3) { R(296, 88, 4, 10, '#fbbf24'); R(350, 88, 4, 10, '#fbbf24'); R(296, 86, 58, 2, '#22d3ee'); }
+            if (G.pool2) { ctx.fillStyle = '#f8fafc'; for (let i = 0; i < 6; i++) ctx.fillRect(10 + i * 13, 174 + Math.sin(now * 3 + i), 5, 2); }
+            if (G.pool3) { R(6, 160, 82, 2, '#fbbf24'); ctx.fillStyle = '#e2e8f0'; for (let i = 0; i < 3; i++) { const q = (now * 0.5 + i / 3) % 1; ctx.globalAlpha = 1 - q; ctx.fillRect(26 + i * 22, 156 - q * 18, 4, 3); ctx.globalAlpha = 1; } }
+            if (G.trophy) {     // trophy case: one medal per podium
+                R(42, 34, 58, 38, '#78350f'); R(45, 37, 52, 32, '#1e293b'); R(45, 53, 52, 2, '#78350f');
+                const n = Math.min(8, career.podiums || 0);
+                for (let i = 0; i < n; i++) { const x = 49 + (i % 4) * 12, y = i < 4 ? 41 : 57; R(x, y, 6, 6, '#facc15'); R(x + 2, y + 6, 2, 3, '#ca8a04'); }
+            }
+            if (G.neon) { ctx.save(); ctx.shadowColor = '#d946ef'; ctx.shadowBlur = 6; ctx.fillStyle = Math.floor(now * 3) % 7 === 0 ? '#86198f' : '#f0abfc'; ctx.font = "8px 'Press Start 2P', monospace"; ctx.textAlign = 'center'; ctx.fillText('NO PAIN', 180, 46); ctx.restore(); }
+            if (G.mascot) {     // gym dog
+                const j = Math.abs(Math.sin(now * 3)) * 2, w = Math.sin(now * 10) * 2;
+                R(204, 162 - j, 16, 8, '#d6a45a'); R(220, 157 - j, 9, 8, '#d6a45a'); R(226, 155 - j, 3, 5, '#92400e'); R(225, 159 - j, 2, 2, '#111827'); R(200, 160 - j + w, 4, 3, '#d6a45a'); R(205, 170 - j, 3, 5 + j, '#92400e'); R(216, 170 - j, 3, 5 + j, '#92400e');
+            }
+            if (G.camera) {     // action cam tripod with REC light
+                R(95, 170, 2, 22, '#6b7280'); R(90, 190, 12, 2, '#6b7280'); R(90, 162, 14, 9, '#1f2937'); R(88, 164, 4, 5, '#60a5fa'); R(100, 164, 3, 3, bl ? '#ef4444' : '#450a0a');
+            }
+        }
         function drawGym(now) {
             const cv = document.getElementById('gym-canvas');
             const ctx = cv.getContext('2d');
@@ -1150,6 +1263,7 @@
             ctx.fillStyle = '#facc15'; ctx.fillRect(110, 10, 140, 18);
             ctx.fillStyle = '#000'; ctx.font = "8px 'Press Start 2P', monospace"; ctx.textAlign = 'center'; ctx.fillText('GYM HQ', 180, 23);
             ctx.textAlign = 'left';
+            drawGymExtras(ctx, now, GY);
             drawGear = gearOf();
             if (gearOf().cryo) { ctx.fillStyle = '#1e3a8a'; ctx.fillRect(20, 96, 26, 54); ctx.fillStyle = '#38bdf8'; ctx.fillRect(24, 102, 18, 40); ctx.fillStyle = '#e0f2fe'; ctx.fillRect(18, 92, 30, 6); }
             if (gearOf().dumbbells) drawRack(ctx, 300, GY);
@@ -1231,6 +1345,7 @@
         }
 
         function openGym() {
+            applyLook();
             sound.init();
             if (gym.raf) cancelAnimationFrame(gym.raf);
             const p = player();
@@ -1415,7 +1530,8 @@
         };
 
         function nextSeason() {
-            career.season++; career.day = 1; career.over = false; career.done = {}; career.result = ''; career.lastEvent = '';
+            career.season++; career.weather = {}; career.rivalry = {};
+            if (career.contracts) { career.contracts.offers = []; career.contracts.offerDay = -99; } career.day = 1; career.over = false; career.done = {}; career.result = ''; career.lastEvent = '';
             athletes.forEach(a => {
                 career.points[a.id] = 0;
                 a.actions = maxActions(a); a.fatigue = 10; a.morale = 60; a.restCount = 0; a.domsCleared = false;
@@ -1482,7 +1598,12 @@
                 if (a.isPlayer) {
                     a.fatigue = clamp100(a.fatigue - (12 + (cryo ? 8 : 0) + (career.owned.jacket ? 10 : 0)));
                     a.morale = clamp100(a.morale + (a.fatigue < 50 ? 3 : -3) + (career.owned.chain ? 2 : 0));
-                    career.lastIncome = (career.owned.sponsor ? 35 : 0) + (career.owned.camera ? 60 : 0); career.cash += career.lastIncome;
+                    career.lastIncome = (career.owned.sponsor ? 35 : 0) + (career.owned.camera ? 60 : 0); if (career.owned.merch) career.lastIncome += brandIncome();
+                    career.lastIncome += franIncome();
+                    career.cash += career.lastIncome;
+                    if (career.owned.nutri) a.fitness = clamp100(a.fitness + 1);
+                    if (career.owned.ironracks) a.fatigue = clamp100(a.fatigue - 4);
+                    if (a.strain > 0) a.strain = Math.max(0, a.strain - (career.owned.pool ? 2 : 1));
                     a.actions = maxActions(a); a.restCount = 0; a.domsCleared = false;
                 } else {
                     rivalTrain(a); rivalShop(a);
@@ -1515,7 +1636,7 @@
             }
             renderCalendar(); renderGym();
             sound.playRaceDay();
-            showModal('🏁 RACE DAY!', `${ev.name}<br><span class="text-base text-yellow-300">♪ ${sound.songs[ev.tier].name}</span><br><span class="text-base text-gray-400">Training is locked. Heading to the start line...</span>`, 'GO TO START LINE ▶', startRace, 3500);
+            showModal('🏁 RACE DAY!', `${ev.name}<br><span class="text-base text-yellow-300">♪ ${sound.songs[ev.tier].name}</span><br><span class="text-base text-gray-400">Training is locked. Heading to the start line...</span>`, 'GO TO START LINE ▶', openTactics, 3500);
         }
         function getEntrants() {
             const ev = todaysEvent();
@@ -1530,6 +1651,8 @@
         }
 
         // ---- pro shop ----
+        const FAC_CATS = ['FACILITY', 'STAFF', 'INVESTMENT', 'STATUS'];
+        let shopTab = 'gear';
         const SHOP_ITEMS = [
             { id: 'shoes',     icon: '👟', cat: 'FOOTWEAR',   name: 'CARBON-PLATED RACERS',     price: 400,  pip: '#facc15', desc: '+5% running speed on all run legs.' },
             { id: 'chalk',     icon: '🧴', cat: 'GRIPS',      name: 'PRO LIQUID CHALK',         price: 250,  pip: '#f8fafc', desc: '-45% wall ball misses, fewer grip slips and shorter slip delays.' },
@@ -1549,21 +1672,47 @@
             { id: 'chain',     icon: '⛓️', cat: 'STYLE',      name: 'GOLD CHAIN',               price: 250,  pip: '#facc15', desc: '+2 morale every night. Pure swagger.' },
             { id: 'sponsor',   icon: '🏷️', cat: 'INCOME',     name: 'SPONSOR PATCH',            price: 600,  pip: '#fde047', desc: '+$35 every day.' },
             { id: 'camera',    icon: '📹', cat: 'INCOME',     name: 'ACTION CAM',               price: 1200, pip: '#ef4444', desc: '+$60 every day from your stream.' },
-            { id: 'watch',     icon: '⌚', cat: 'ACTIONS',    name: 'SMART WATCH',              price: 2200, pip: '#4ade80', desc: '+1 action every day (3 → 4). The best investment in the shop.' }
+            { id: 'watch',     icon: '⌚', cat: 'ACTIONS',    name: 'SMART WATCH',              price: 2200, pip: '#4ade80', desc: '+1 action every day (3 → 4). The best investment in the shop.' },
+            { id: 'altitude',  icon: '🏔️', cat: 'FACILITY',   name: 'ALTITUDE CHAMBER',         price: 2500, desc: 'Track Run permanently trains +1 more SPD and +1 more PACE.' },
+            { id: 'ironracks', icon: '🏗️', cat: 'FACILITY',   name: 'PRO-GRADE IRON RACKS',     price: 2200, desc: 'Heavy Lift trains +1 STR and adds 5 less FAT. Clears 4 extra FAT every night.' },
+            { id: 'pool',      icon: '🏊', cat: 'FACILITY',   name: 'HYDROTHERAPY POOL',        price: 2000, desc: 'Full Rest days clear 15 extra FAT automatically.' },
+            { id: 'physio',    icon: '👩‍⚕️', cat: 'STAFF',      name: 'TEAM PHYSIO / MASSEUSE',   price: 2800, desc: 'Completely neutralizes the DOMS -15% race penalty.' },
+            { id: 'nutri',     icon: '🥗', cat: 'STAFF',      name: 'NUTRITIONIST',             price: 1800, desc: 'Meals give +6 MOR and +1 FIT more. +1 FIT every night (raises race starting stamina).' },
+            { id: 'merch',     icon: '🏪', cat: 'INVESTMENT', name: 'MERCH EMPIRE / BRAND HUB', price: 3500, desc: 'Passive daily cash that grows with your fan count (from race results) and ladder rank.' },
+            { id: 'slip',       icon: '🌀', cat: 'MOVE KIT', name: 'SLIPSTREAM KIT',   price: 900,  desc: 'Move [4] DRAFT (25 meter): tuck behind a rival ahead, +12% speed for 5 s. No referee risk.' },
+            { id: 'secondwind', icon: '💨', cat: 'MOVE KIT', name: 'SECOND WIND PACK', price: 1100, desc: 'Move [5] 2ND WIND (40 meter): +25 stamina, once per race.' },
+            { id: 'hypespk',    icon: '📣', cat: 'MOVE KIT', name: 'HYPE SPEAKER',     price: 1000, desc: 'Move [6] HYPE (35 meter): the crowd roars, +8% speed for 4 s.' },
+            { id: 'pacelock',   icon: '🔒', cat: 'MOVE KIT', name: 'PACE LOCK CHIP',   price: 1400, desc: 'Move [7] PACE LOCK (30 meter): 40% less stamina burn for 8 s.' },
+            { id: 'bribe',      icon: '💵', cat: 'MOVE KIT', name: 'BRIBE ENVELOPE',   price: 1600, desc: 'Move [8] BRIBE (40 meter): your next Shove cannot be caught. Costs $150 at the end of the race if used.' },
+            { id: 'spill',      icon: '💦', cat: 'MOVE KIT', name: 'WATER SPILL KIT',  price: 1200, desc: 'Move [9] SPILL (45 meter): slip trap for a rival ahead. 55% the referee catches you.' },
+            { id: 'focus',      icon: '🧘', cat: 'MOVE KIT', name: 'FOCUS BAND',       price: 1500, desc: 'Passive: your tactical meter fills 50% faster.' },
+            { id: 'altitude2',  icon: '🏔️', cat: 'FACILITY',   name: 'ALTITUDE CHAMBER II',  price: 5000,  req: 'altitude',   desc: 'Upgrade: Track Run trains another +1 SPD and +1 PACE.' },
+            { id: 'altitude3',  icon: '🏔️', cat: 'FACILITY',   name: 'ALTITUDE CHAMBER III', price: 9000,  req: 'altitude2',  desc: 'Upgrade: another +1 SPD and +1 PACE on Track Run.' },
+            { id: 'ironracks2', icon: '🏗️', cat: 'FACILITY',   name: 'IRON RACKS II',        price: 4500,  req: 'ironracks',  desc: 'Upgrade: Heavy Lift trains another +1 STR and costs 3 less FAT.' },
+            { id: 'ironracks3', icon: '🏗️', cat: 'FACILITY',   name: 'IRON RACKS III',       price: 8500,  req: 'ironracks2', desc: 'Upgrade: another +1 STR and 3 less FAT per lift.' },
+            { id: 'pool2',      icon: '🏊', cat: 'FACILITY',   name: 'HYDRO POOL II',        price: 4000,  req: 'pool',       desc: 'Upgrade: Full Rest clears 10 more FAT.' },
+            { id: 'pool3',      icon: '🏊', cat: 'FACILITY',   name: 'HYDRO POOL III',       price: 8000,  req: 'pool2',      desc: 'Upgrade: Full Rest clears another 10 FAT.' },
+            { id: 'trophy',     icon: '🏆', cat: 'STATUS',     name: 'TROPHY CASE',          price: 1500,  desc: 'Shows a medal for each podium finish. +10% fan gain.' },
+            { id: 'neon',       icon: '💡', cat: 'STATUS',     name: 'NEON SIGN',            price: 1200,  desc: 'A glowing NO PAIN sign. +10% fan gain.' },
+            { id: 'mascot',     icon: '🐕', cat: 'STATUS',     name: 'GYM MASCOT',           price: 2500,  desc: 'An animated gym dog. +10% fan gain.' },
+            { id: 'fran1',      icon: '🏬', cat: 'INVESTMENT', name: 'GYM FRANCHISE I',      price: 4000,  desc: 'A second gym location: +$80 every day.' },
+            { id: 'fran2',      icon: '🏢', cat: 'INVESTMENT', name: 'GYM FRANCHISE II',     price: 7500,  req: 'fran1',      desc: 'Expansion: +$80 more every day ($160 total).' },
+            { id: 'fran3',      icon: '🏙️', cat: 'INVESTMENT', name: 'GYM FRANCHISE III',    price: 12000, req: 'fran2',      desc: 'National chain: +$120 more every day ($280 total).' }
         ];
         function setShopMsg(t) { document.getElementById('shop-msg').innerText = t; }
         function renderShop() {
             document.getElementById('shop-cash').innerText = '$' + career.cash;
+            ['gear', 'fac', 'kits'].forEach(t => document.getElementById('tab-' + t).className = 'arcade-btn pixel-font text-[9px] px-3 py-2 rounded ' + (shopTab === t ? 'bg-pink-600 text-white' : 'bg-gray-800 text-gray-300'));
             const g = document.getElementById('shop-grid');
             g.innerHTML = '';
-            SHOP_ITEMS.forEach(it => {
-                const owned = career.owned[it.id], afford = career.cash >= it.price;
+            SHOP_ITEMS.filter(it => shopTab === (FAC_CATS.includes(it.cat) ? 'fac' : it.cat === 'MOVE KIT' ? 'kits' : 'gear')).forEach(it => {
+                const owned = career.owned[it.id], afford = career.cash >= it.price && (!it.req || career.owned[it.req]);
                 const d = document.createElement('div');
                 d.className = 'bg-gray-900 border-2 rounded p-3 flex flex-col gap-1.5 ' + (owned ? 'border-emerald-500' : 'border-gray-800');
                 d.innerHTML = `<div class="flex justify-between items-start"><div class="text-2xl">${it.icon}</div><span class="pixel-font text-[8px] text-teal-400">${it.cat}</span></div>
                     <div class="pixel-font text-[10px] text-white">${it.name}</div>
                     <div class="text-[14px] text-gray-400 flex-1 leading-tight">${it.desc}</div>
-                    <button data-id="${it.id}" class="buy-btn arcade-btn pixel-font text-[9px] py-2 rounded font-black ${owned ? 'bg-emerald-700 text-white' : afford ? 'bg-yellow-500 hover:bg-yellow-400 text-black' : 'bg-gray-700 text-gray-400'}">${owned ? 'EQUIPPED ✔' : 'BUY $' + it.price}</button>`;
+                    <button data-id="${it.id}" class="buy-btn arcade-btn pixel-font text-[9px] py-2 rounded font-black ${owned ? 'bg-emerald-700 text-white' : afford ? 'bg-yellow-500 hover:bg-yellow-400 text-black' : 'bg-gray-700 text-gray-400'}">${owned ? 'EQUIPPED ✔' : it.req && !career.owned[it.req] ? 'LOCKED 🔒' : 'BUY $' + it.price}</button>`;
                 g.appendChild(d);
             });
             updateHeaderHUD();
@@ -1572,6 +1721,7 @@
             sound.init();
             const it = SHOP_ITEMS.find(i => i.id === id);
             if (career.owned[id]) { sound.playCare('DENY'); setShopMsg('ALREADY EQUIPPED!'); return; }
+            if (it.req && !career.owned[it.req]) { sound.playCare('DENY'); setShopMsg('NEEDS ' + SHOP_ITEMS.find(i => i.id === it.req).name + ' FIRST!'); return; }
             if (career.cash < it.price) { sound.playCare('DENY'); setShopMsg(`NEED $${it.price - career.cash} MORE. WIN PODIUMS!`); return; }
             career.cash -= it.price; career.owned[id] = true;
             if (id === 'watch') player().actions++;
@@ -1597,9 +1747,10 @@
         function openShop() {
             showScreen('shop');
             renderShop();
-            setShopMsg('WELCOME, ' + player().name + '!');
+            setShopMsg('WELCOME, ' + player().name + '! FANS: ' + (career.fans || 0));
             shopRaf = requestAnimationFrame(shopLoop);
         }
+        ['gear', 'fac', 'kits'].forEach(t => document.getElementById('tab-' + t).onclick = () => { shopTab = t; sound.init(); sound.playTone(660, 0.05, 'square', 0.05); renderShop(); });
         document.getElementById('shop-grid').onclick = e => { const b = e.target.closest('.buy-btn'); if (b) buyItem(b.dataset.id); };
         document.getElementById('shop-back-btn').onclick = openGym;
         document.getElementById('gym-shop-btn').onclick = () => { sound.init(); sound.playCoin(); openShop(); };
@@ -2361,6 +2512,361 @@
         const CORRAL_OFFSET = 130; // how far past the finish line racers walk to wait
         const PULL_DIST = 460;     // how far the sled starts from the puller
 
+
+        // ==========================================
+        // 2c. RACE TACTICS: pacing, consumables, special moves, referee
+        // ==========================================
+        const PACINGS = [
+            ['CON', '🐢 CONSERVATIVE / NEGATIVE SPLIT', 'Slower start, low stamina burn. Big speed + stamina recovery in the final 3 legs.'],
+            ['BAL', '⚖️ BALANCED', 'The standard baseline.'],
+            ['AGG', '🔥 AGGRESSIVE / FRONT-RUNNER', 'Fast start and early lead, heavy stamina burn, high cramp risk late.']
+        ];
+        const CONSUMABLES = [
+            { id: 'caf',  icon: '☕', name: 'CAFFEINE SHOT', price: 60, desc: '+8% speed through the first 5 stages.' },
+            { id: 'bcaa', icon: '🧪', name: 'BCAA MIX',      price: 80, desc: '-60% cramp risk all race.' },
+            { id: 'carb', icon: '🍌', name: 'CARB LOAD',        price: 50, desc: '+10 starting stamina.' },
+            { id: 'elec', icon: '🧃', name: 'ELECTROLYTE TABS', price: 70, desc: '-50% grip slips on the stations.' },
+            { id: 'heat', icon: '🔥', name: 'HEAT RUB',         price: 60, desc: 'No cramps in the first half of the race.' },
+            { id: 'hype', icon: '🎧', name: 'HYPE PLAYLIST',    price: 80, desc: 'Start with 50 meter: moves ready early.' },
+            { id: 'beet', icon: '🥤', name: 'BEET JUICE',       price: 90, desc: '-20% stamina burn on run legs.' }
+        ];
+        let raceTactics = { pace: 'BAL', caf: false, bcaa: false };
+        const tacCost = () => CONSUMABLES.reduce((s, c) => s + (raceTactics[c.id] ? c.price : 0), 0);
+        function renderTactics() {
+            const on = 'border-yellow-400 bg-yellow-500/10', off = 'border-gray-700';
+            document.getElementById('tac-pace').innerHTML = PACINGS.map(([k, n, d]) =>
+                `<button data-p="${k}" class="text-left border-2 rounded p-2 ${raceTactics.pace === k ? on : off}"><div class="pixel-font text-[9px] text-white">${n}</div><div class="text-[15px] text-gray-400 leading-tight">${d}</div></button>`).join('');
+            document.getElementById('tac-cons').innerHTML = CONSUMABLES.map(c =>
+                `<button data-c="${c.id}" class="text-left border-2 rounded p-2 ${raceTactics[c.id] ? on : off}"><div class="pixel-font text-[9px] text-white">${c.icon} ${c.name} · $${c.price} ${raceTactics[c.id] ? '✔' : ''}</div><div class="text-[15px] text-gray-400 leading-tight">${c.desc}</div></button>`).join('');
+            document.getElementById('tac-cash').innerText = `CASH $${career.cash - tacCost()}`;
+        }
+        function openTactics() {
+            const box = document.getElementById('tactics');
+            if (isRacing || !box.classList.contains('hidden')) return;
+            CONSUMABLES.forEach(c => raceTactics[c.id] = false);
+            const ev = todaysEvent(), wi = WEATHER_INFO[raceWeather = weatherFor(ev)], nem = athletes.find(a => a.id === nemesisId());
+            document.getElementById('tac-sub').innerHTML = `${ev.name}<br>${wi[0]}: ${wi[1]}` + (nem ? `<br>${PERS[persOf(nem)][1]} NEMESIS: ${nem.name} (${PERS[persOf(nem)][0]}). Beat them for bonus fans.` : '');
+            renderKitButtons(); renderTactics(); box.classList.remove('hidden');
+        }
+        document.getElementById('tac-pace').onclick = e => { const b = e.target.closest('[data-p]'); if (b) { raceTactics.pace = b.dataset.p; sound.init(); sound.playTone(520, 0.05, 'square', 0.05); renderTactics(); } };
+        document.getElementById('tac-cons').onclick = e => {
+            const b = e.target.closest('[data-c]'); if (!b) return;
+            const c = CONSUMABLES.find(x => x.id === b.dataset.c); sound.init();
+            if (!raceTactics[c.id] && (career.cash < tacCost() + c.price || CONSUMABLES.filter(x => raceTactics[x.id]).length >= 4)) { sound.playCare('DENY'); return; }
+            raceTactics[c.id] = !raceTactics[c.id]; sound.playTone(660, 0.05, 'square', 0.05); renderTactics();
+        };
+        document.getElementById('tac-go').onclick = () => {
+            career.cash -= tacCost(); saveGame();
+            document.getElementById('tactics').classList.add('hidden'); launchRace();
+        };
+
+        function raceToast(msg) {
+            const b = document.getElementById('move-toast');
+            b.innerText = msg;
+            clearTimeout(raceToast.t); raceToast.t = setTimeout(() => { b.innerText = ''; }, 2600);
+        }
+        function forceCramp(r) {
+            r.event = 'CRAMP'; setTimeout(() => { if (r.event === 'CRAMP') r.event = null; }, 3000 / simSpeed);
+            if (r.isPlayer) { raceToast('CRAMP! YOU WENT OUT TOO HARD'); sound.playEvent(); }
+        }
+        // Pacing, consumables and move effects: one speed multiplier per runner per frame
+        function tacticMult(r) {
+            const i = r.stageIdx, early = i <= 6, late = i >= 14, dt = simSpeed, stg = STAGES[i];
+            if (!r.isPlayer) rivalAI(r);
+            let m = 1;
+            if (r.strat === 'CON') {
+                if (early) m *= 0.95;
+                if (late) { m *= 1.1; r.staminaCurrent = Math.min(100, r.staminaCurrent + 0.014 * dt); }
+            } else if (r.strat === 'AGG') {
+                if (early) m *= 1.08;
+                if (late) { m *= 0.97; if (!r.event && Math.random() < 0.0004 * dt * (r.bcaa ? 0.4 : 1)) forceCramp(r); }
+            }
+            if (r.caf && i <= 4) m *= 1.08;
+            if (r.adrStage === i) m *= 1.3;
+            else if (r.adrStage >= 0 && !r.adrDone) {   // surge leg is over: crash
+                r.adrDone = true; r.staminaCurrent = Math.max(20, r.staminaCurrent - 35); r.exhaustT = 700;
+                if (r.isPlayer) raceToast('💀 SURGE OVER: EXHAUSTED!');
+            }
+            if (r.exhaustT > 0) { m *= 0.88; r.exhaustT -= dt; }
+            if (r.talkT > 0)    { m *= 0.9;  r.talkT -= dt; }
+            if (r.stallT > 0)   { m *= 0.25; r.stallT -= dt; }
+            if (r.burstT > 0)   { m *= 1.12; r.burstT -= dt; }
+            if (r.holdT > 0)    { m *= 0.02; r.holdT -= dt; }    // referee hold
+            if (stg && stg.type === 'RUN') { if (raceWeather === 'RAIN') m *= 0.97; else if (raceWeather === 'WIND') m *= 0.96; }
+            if (r.strained) m *= 0.92;
+            if (r.isPlayer && stg && stg.isStation) m *= perkMult(stg.type);
+            if (r.draftT > 0) { m *= 1.12; r.draftT -= dt; }
+            if (r.hypeT > 0)  { m *= 1.08; r.hypeT -= dt; }
+            if (r.lockT > 0)  r.lockT -= dt;
+            r.meter = Math.min(100, r.meter + 0.05 * dt * (r.focus ? 1.5 : 1));
+            return m;
+        }
+        const decayMult = r => (r.strat === 'CON' ? (r.stageIdx <= 6 ? 0.7 : r.stageIdx >= 14 ? 0.4 : 1) : r.strat === 'AGG' ? 1.6 : 1)
+            * (r.lockT > 0 ? 0.6 : 1) * (raceWeather === 'HEAT' ? 1.25 * (r.gear.vest ? 0.85 : 1) * (r.gear.hydration ? 0.85 : 1) : 1) * (r.tac.beet && STAGES[r.stageIdx] && STAGES[r.stageIdx].type === 'RUN' ? 0.8 : 1);
+        function nearestRival(r, range) {
+            let best = null, bd = range;
+            engine.runners.forEach(o => { if (o !== r && o.status === 'RACING') { const d = Math.abs(o.worldX - r.worldX); if (d < bd) { bd = d; best = o; } } });
+            return best;
+        }
+        function useMove(kind) {
+            if (!isRacing) return;
+            const r = engine.runners.find(x => x.isPlayer);
+            if (!r || r.status !== 'RACING') return;
+            sound.init();
+            const deny = msg => { sound.playCare('DENY'); raceToast(msg); };
+            const kit = KITS.find(k => k.mv === kind); if (kit && !career.owned[kit.id]) return;
+            if (kind === 'ADR') {
+                if (r.adrUsed) return deny('SURGE ALREADY USED');
+                if (r.meter < 60) return deny('NEED 60 METER');
+                r.meter -= 60; r.adrUsed = true; r.adrStage = r.stageIdx;
+                raceToast('⚡ ADRENALINE SURGE! +30% THIS LEG'); sound.playTone(660, 0.1, 'square', 0.1); setTimeout(() => sound.playTone(1320, 0.2, 'square', 0.1), 90);
+            } else if (kind === 'TALK') {
+                if (r.meter < 30) return deny('NEED 30 METER');
+                const t = nearestRival(r, 450); if (!t) return deny('NO RIVAL IN RANGE');
+                r.meter -= 30; t.talkT = 300; t.morale = clamp100((t.morale || 50) - 15);
+                raceToast(`🗣 ${t.name} IS RATTLED!`); sound.playTone(300, 0.12, 'sawtooth', 0.08);
+            } else if (kit) { useKit(r, kit, deny);
+            } else if (kind === 'SAB') {
+                if (r.meter < 50) return deny('NEED 50 METER');
+                const t = nearestRival(r, 140); if (!t) return deny('NO RIVAL CLOSE ENOUGH');
+                r.meter -= 50;
+                const bribed = r.bribed; if (bribed) { r.bribed = false; r.bribeUsed = true; }
+                if (bribed || Math.random() >= 0.4) {            // referee looked away
+                    t.stallT = 100; r.burstT = 150;
+                    raceToast(`🥷 CLEAN SHOVE! ${t.name} LOSES MOMENTUM`); sound.playTone(200, 0.15, 'square', 0.1);
+                } else if (Math.random() < 0.25) {     // referee caught you: disqualified
+                    r.status = 'DSQ'; r.dsq = true;
+                    raceToast('🚫 REFEREE: DISQUALIFIED! 0 POINTS'); sound.playEvent();
+                } else {                                // time penalty: hold position 3-5 s
+                    r.holdT = 180 + Math.floor(Math.random() * 121);
+                    raceToast(`🟨 FOUL! HOLD ${(r.holdT / 60).toFixed(0)} SEC`); sound.playCare('DENY');
+                }
+            }
+        }
+        function updateTactics() {
+            const r = engine.runners.find(x => x.isPlayer); if (!r) return;
+            document.getElementById('meter-fill').style.width = r.meter + '%';
+            KITS.forEach(k => { const b = document.getElementById('mv-' + k.mv); if (b) { b.disabled = r.status !== 'RACING' || r.meter < k.cost || (k.mv === 'WIND' && r.windUsed); b.classList.toggle('opacity-40', b.disabled); } });
+            [['mv-adr', !r.adrUsed && r.meter >= 60], ['mv-talk', r.meter >= 30], ['mv-sab', r.meter >= 50]].forEach(([id, ok]) => {
+                const b = document.getElementById(id); b.disabled = r.status !== 'RACING' || !ok; b.classList.toggle('opacity-40', b.disabled);
+            });
+        }
+        document.getElementById('tactics-hud').onclick = e => { const b = e.target.closest('[data-mv]'); if (b) useMove(b.dataset.mv); };
+        document.addEventListener('keydown', e => { if (isRacing) { const k = { '1': 'ADR', '2': 'TALK', '3': 'SAB', '4': 'SLIP', '5': 'WIND', '6': 'HYPE', '7': 'LOCK', '8': 'BRIBE', '9': 'SPILL' }[e.key]; if (k) useMove(k); } });
+
+        const KITS = [
+            { id: 'slip', mv: 'SLIP', key: 4, cost: 25, label: '🌀 DRAFT' }, { id: 'secondwind', mv: 'WIND', key: 5, cost: 40, label: '💨 2ND WIND' },
+            { id: 'hypespk', mv: 'HYPE', key: 6, cost: 35, label: '📣 HYPE' }, { id: 'pacelock', mv: 'LOCK', key: 7, cost: 30, label: '🔒 LOCK' },
+            { id: 'bribe', mv: 'BRIBE', key: 8, cost: 40, label: '💵 BRIBE' }, { id: 'spill', mv: 'SPILL', key: 9, cost: 45, label: '💦 SPILL' }];
+        function renderKitButtons() {
+            document.getElementById('kit-btns').innerHTML = KITS.filter(k => career.owned[k.id]).map(k =>
+                `<button id="mv-${k.mv}" data-mv="${k.mv}" class="arcade-btn pixel-font text-[8px] px-2 py-1.5 rounded bg-indigo-700 text-white">${k.label} ${k.cost} [${k.key}]</button>`).join('');
+        }
+        // Referee check: returns true if you got away with it; otherwise a hold (3-5 s) or a DSQ
+        function refCheck(r, catchP) {
+            if (Math.random() >= catchP) return true;
+            if (Math.random() < 0.25) { r.status = 'DSQ'; r.dsq = true; raceToast('🚫 REFEREE: DISQUALIFIED! 0 POINTS'); sound.playEvent(); }
+            else { r.holdT = 180 + Math.floor(Math.random() * 121); raceToast(`🟨 FOUL! HOLD ${(r.holdT / 60).toFixed(0)} SEC`); sound.playCare('DENY'); }
+            return false;
+        }
+        function useKit(r, k, deny) {
+            if (r.meter < k.cost) return deny('NEED ' + k.cost + ' METER');
+            const ahead = () => { const t = nearestRival(r, 300); return t && t.worldX > r.worldX ? t : null; };
+            if (k.mv === 'SLIP') { if (!ahead()) return deny('NO RIVAL AHEAD TO DRAFT'); r.draftT = 300; raceToast('🌀 DRAFTING! +12% SPEED'); }
+            else if (k.mv === 'WIND') { if (r.windUsed) return deny('ALREADY USED'); r.windUsed = true; r.staminaCurrent = Math.min(100, r.staminaCurrent + 25); raceToast('💨 SECOND WIND! +25 STAMINA'); }
+            else if (k.mv === 'HYPE') { r.hypeT = 240; raceToast('📣 THE CROWD ROARS! +8% SPEED'); }
+            else if (k.mv === 'LOCK') { r.lockT = 480; raceToast('🔒 PACE LOCKED: LOW STAMINA BURN'); }
+            else if (k.mv === 'BRIBE') { if (r.bribed) return deny('ENVELOPE ALREADY READY'); r.bribed = true; raceToast('💵 REF BRIBED: NEXT SHOVE IS SAFE'); }
+            else if (k.mv === 'SPILL') {
+                const t = ahead(); if (!t) return deny('NO RIVAL AHEAD');
+                r.meter -= k.cost;
+                if (refCheck(r, 0.55)) { t.stallT = 90; raceToast(`💦 ${t.name} SLIPS ON THE SPILL!`); }
+                sound.playTone(520, 0.1, 'triangle', 0.1); return;
+            }
+            r.meter -= k.cost; sound.playTone(520, 0.1, 'triangle', 0.1);
+        }
+
+        // Facility levels: counts id, id2, id3 owned
+        const lv = (a, id) => (has(a, id) ? 1 : 0) + (has(a, id + '2') ? 1 : 0) + (has(a, id + '3') ? 1 : 0);
+        const franIncome = () => (career.owned.fran1 ? 80 : 0) + (career.owned.fran2 ? 80 : 0) + (career.owned.fran3 ? 120 : 0);
+        const SERVICES = {
+            massage: { icon: '💆', name: 'SPORTS MASSAGE', apply: a => { a.fatigue = clamp100(a.fatigue - 25); } },
+            spa:     { icon: '🧖', name: 'SPA DAY',        apply: a => { a.morale = clamp100(a.morale + 20); a.fatigue = clamp100(a.fatigue - 10); } },
+            coach:   { icon: '🎓', name: 'PRIVATE COACHING', apply: (a, stat) => { a[stat] = capStat(a[stat] + 1); career.coachN = (career.coachN || 0) + 1; } }
+        };
+        const svcPrice = id => id === 'massage' ? 150 : id === 'spa' ? 200 : 300 + 100 * (career.coachN || 0);
+        function renderServices() {
+            const el = document.getElementById('services'); if (!el || !career) return;
+            const bd = document.getElementById('strain-badge'), pl = player();
+            if (pl && pl.strain > 0) { bd.classList.remove('hidden'); bd.innerText = `🤕 STRAINED ${pl.strain}D · GAINS HALVED · -8% SPEED`; } else bd.classList.add('hidden');
+            const used = k => (career.svcDay || {})[k] === career.day, lock = isRaceDay();
+            const btn = (attrs, label, id) => { const p = svcPrice(id), dis = used(id) || lock || career.cash < p;
+                return `<button ${attrs} ${dis ? 'disabled' : ''} class="arcade-btn pixel-font text-[8px] px-2 py-1.5 rounded ${dis ? 'bg-gray-800 text-gray-500' : 'bg-teal-700 text-white'}">${label} $${p}${used(id) ? ' ✔' : ''}</button>`; };
+            el.innerHTML = btn('data-svc="massage"', '💆 MASSAGE -25 FAT', 'massage') + btn('data-svc="spa"', '🧖 SPA +20 MOR', 'spa')
+                + [['strength', 'STR'], ['speed', 'SPD'], ['pace', 'PACE']].map(([s, l]) => btn(`data-svc="coach" data-stat="${s}"`, `🎓 COACH +1 ${l}`, 'coach')).join('');
+        }
+        function buyService(id, stat) {
+            sound.init();
+            const s = SERVICES[id], p = svcPrice(id); career.svcDay = career.svcDay || {};
+            if (career.svcDay[id] === career.day || isRaceDay()) return;
+            if (career.cash < p) { sound.playCare('DENY'); setGymCaption(`NEED $${p - career.cash} MORE`); return; }
+            career.cash -= p; career.svcDay[id] = career.day; s.apply(player(), stat);
+            sound.playBuy(); setGymCaption(`${s.icon} ${s.name}! -$${p}`);
+            saveGame(); renderGym(); renderCalendar(); updateHeaderHUD();
+        }
+        document.getElementById('services').onclick = e => { const b = e.target.closest('[data-svc]'); if (b) buyService(b.dataset.svc, b.dataset.stat); };
+
+        // ==========================================
+        // 2d. RIVAL PERSONALITIES, WEATHER, INJURIES
+        // ==========================================
+        const PERS = { TALK: ['TRASH TALKER', '🗣'], BRUISER: ['BRUISER', '💪'], FRONT: ['FRONT-RUNNER', '🏃'], STEADY: ['STEADY', '⚖️'], CLOSER: ['CLOSER', '🏁'] };
+        const PERS_KEYS = Object.keys(PERS);
+        const RIVAL_STRAT = { TALK: 'BAL', BRUISER: 'AGG', FRONT: 'AGG', STEADY: 'BAL', CLOSER: 'CON' };
+        const persOf = a => a.pers || (a.pers = PERS_KEYS[[...String(a.id)].reduce((s, c) => s + c.charCodeAt(0), 0) % 5]);
+        function bumpRivalry(id) { career.rivalry = career.rivalry || {}; career.rivalry[id] = (career.rivalry[id] || 0) + 1; }
+        function nemesisId() {
+            const rv = career.rivalry || {}; let best = null, bv = 0;
+            athletes.forEach(a => { if (!a.isPlayer && (rv[a.id] || 0) > bv) { best = a.id; bv = rv[a.id]; } });
+            if (best !== null) return best;
+            const top = standings().find(a => !a.isPlayer); return top ? top.id : null;
+        }
+        // Rivals think once a second: trash-talk or shove the player when close. The referee can catch them too.
+        function rivalAI(r) {
+            if (r.status !== 'RACING') return;
+            if ((r.aiT = (r.aiT || 0) - simSpeed) > 0) return;
+            r.aiT = 60;
+            const p = engine.runners.find(x => x.isPlayer);
+            if (!p || p.status !== 'RACING') return;
+            const d = Math.abs(p.worldX - r.worldX), P = r.pers;
+            if (r.meter >= 30 && d < 450 && Math.random() < (P === 'TALK' ? 0.3 : P === 'CLOSER' ? 0.08 : 0.04)) {
+                r.meter -= 30; p.talkT = 300; bumpRivalry(r.id); raceToast(`🗣 ${r.name} TRASH-TALKS YOU!`); sound.playTone(260, 0.1, 'sawtooth', 0.06);
+            } else if (r.meter >= 50 && d < 140 && Math.random() < (P === 'BRUISER' ? 0.3 : 0.05)) {
+                r.meter -= 50; bumpRivalry(r.id);
+                if (Math.random() >= 0.4) { p.stallT = 100; r.burstT = 150; raceToast(`🥷 ${r.name} SHOVES YOU!`); sound.playTone(200, 0.15, 'square', 0.08); }
+                else if (Math.random() < 0.25) { r.status = 'DSQ'; r.dsq = true; raceToast(`🚫 ${r.name} DISQUALIFIED FOR FOUL PLAY!`); }
+                else { r.holdT = 180 + Math.floor(Math.random() * 121); raceToast(`🟨 ${r.name} CAUGHT SHOVING: HELD!`); }
+            }
+        }
+        const WEATHER_INFO = { CLEAR: ['☀️ CLEAR', 'perfect conditions.'], RAIN: ['🌧️ RAIN', 'grip slips x1.8 (chalk helps), run legs -3%.'], HEAT: ['🔥 HEAT', 'stamina burns 25% faster (vest and hydration help).'], WIND: ['💨 WIND', 'run legs -4%.'] };
+        let raceWeather = 'CLEAR';
+        function weatherFor(ev) {
+            career.weather = career.weather || {};
+            if (!career.weather[ev.key]) { const x = Math.random(); career.weather[ev.key] = x < 0.4 ? 'CLEAR' : x < 0.6 ? 'RAIN' : x < 0.8 ? 'HEAT' : 'WIND'; saveGame(); }
+            return career.weather[ev.key];
+        }
+        function drawWeather(ctx) {
+            if (!raceWeather || raceWeather === 'CLEAR') return;
+            const W = 1150, H = 680, t = globalTime;
+            if (raceWeather === 'RAIN') { ctx.fillStyle = 'rgba(30,58,138,0.18)'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = 'rgba(186,230,253,0.55)'; for (let i = 0; i < 90; i++) ctx.fillRect((i * 97 + t * 40) % W, (i * 53 + t * 620) % H, 2, 12); }
+            else if (raceWeather === 'HEAT') { ctx.fillStyle = 'rgba(249,115,22,0.12)'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = 'rgba(254,243,199,0.18)'; for (let i = 0; i < 5; i++) ctx.fillRect(0, 150 + i * 120 + Math.sin(t * 3 + i) * 6, W, 3); }
+            else { ctx.fillStyle = 'rgba(226,232,240,0.35)'; for (let i = 0; i < 14; i++) ctx.fillRect(((i * 173 - t * 500) % W + W) % W, 140 + (i * 47) % 520, 40, 2); }
+        }
+
+        // ==========================================
+        // 2e. CONTRACTS, STATION PERKS, ACHIEVEMENTS, CAREER SCREEN
+        // ==========================================
+        const CONTRACT_TYPES = {
+            PODIUM2: { text: 'PODIUM IN 2 RACES', need: 2, cash: 600, fans: 60 },
+            TOP5:    { text: 'TOP 5 IN 3 RACES', need: 3, cash: 700, fans: 50 },
+            CLEAN:   { text: 'FINISH 3 RACES WITHOUT A DSQ', need: 3, cash: 400, fans: 40 },
+            WIN:     { text: 'WIN A RACE', need: 1, cash: 800, fans: 100 },
+            THROW:   { text: 'SHADY RIVAL DEAL: FINISH OUTSIDE THE TOP 5 NEXT RACE', need: 1, cash: 900, fans: -80 }
+        };
+        function genOffers() {
+            const pool = ['PODIUM2', 'TOP5', 'CLEAN', 'WIN'].sort(() => Math.random() - 0.5).slice(0, 3);
+            if (Math.random() < 0.25) pool[2] = 'THROW';
+            const mul = 1 + 0.25 * (career.season - 1);
+            return pool.map(k => ({ k, cash: Math.round(CONTRACT_TYPES[k].cash * mul), fans: CONTRACT_TYPES[k].fans }));
+        }
+        const money = c => `$${c.cash} ${c.fans >= 0 ? '+' : ''}${c.fans} FANS`;
+        function renderContracts() {
+            const el = document.getElementById('contracts'); if (!el || !career) return;
+            const cs = career.contracts = career.contracts || { offers: [], active: null, offerDay: -99 };
+            if (!cs.active && career.day >= cs.offerDay + 5) { cs.offers = genOffers(); cs.offerDay = career.day; }
+            const note = cs.note ? `<div class="text-[12px] text-emerald-300">${cs.note}</div>` : '';
+            if (cs.active) {
+                const c = cs.active;
+                el.innerHTML = note + `<div class="text-[13px] text-white">📝 ${CONTRACT_TYPES[c.k].text}</div><div class="text-[12px] text-gray-400">PROGRESS ${c.have}/${CONTRACT_TYPES[c.k].need} · ${money(c)}</div><button data-ct="drop" class="arcade-btn pixel-font text-[8px] px-2 py-1.5 rounded bg-gray-800 text-gray-300">ABANDON</button>`;
+            } else {
+                el.innerHTML = note + (cs.offers.map((c, i) => `<button data-ct="${i}" class="arcade-btn text-left text-[12px] px-2 py-1.5 rounded bg-teal-800 text-white leading-tight">${c.k === 'THROW' ? '🕶️' : '📝'} ${CONTRACT_TYPES[c.k].text}<br><span class="text-yellow-300">${money(c)}</span></button>`).join('')
+                    || '<div class="text-[12px] text-gray-500">NEW OFFERS EVERY 5 DAYS</div>');
+            }
+        }
+        document.getElementById('contracts').onclick = e => {
+            const b = e.target.closest('[data-ct]'); if (!b) return;
+            const cs = career.contracts; sound.init();
+            if (b.dataset.ct === 'drop') cs.active = null;
+            else { cs.active = { ...cs.offers[+b.dataset.ct], have: 0 }; cs.offers = []; cs.note = ''; sound.playBuy(); }
+            saveGame(); renderContracts();
+        };
+        function countStation(t) { career.stn = career.stn || {}; career.stn[t] = (career.stn[t] || 0) + 1; }
+        const perkMult = t => { const n = (career.stn || {})[t] || 0; return n >= 8 ? 1.06 : n >= 3 ? 1.03 : 1; };
+
+        const ACH = [
+            { id: 'win',   name: 'FIRST BLOOD',        desc: 'Win a race',                 ok: () => (career.wins || 0) >= 1,    col: '#facc15', cn: 'GOLD' },
+            { id: 'pod5',  name: 'PODIUM REGULAR',     desc: '5 podium finishes',          ok: () => (career.podiums || 0) >= 5, col: '#7dd3fc', cn: 'ICE' },
+            { id: 'fans',  name: 'CROWD FAVORITE',     desc: '1,000 fans',                 ok: () => (career.fans || 0) >= 1000, col: '#fb7185', cn: 'ROSE' },
+            { id: 'deals', name: 'CONTRACTOR',         desc: 'Complete 3 contracts',       ok: () => (career.cDone || 0) >= 3,   col: '#6ee7b7', cn: 'MINT' },
+            { id: 'nem',   name: 'NEMESIS SLAYER',     desc: 'Beat your nemesis 3 times',  ok: () => (career.nemWins || 0) >= 3, col: '#c084fc', cn: 'VIOLET' },
+            { id: 'perk',  name: 'STATION SPECIALIST', desc: 'Max out a station perk',     ok: () => Object.values(career.stn || {}).some(n => n >= 8), col: '#fb923c', cn: 'FLAME' },
+            { id: 'rich',  name: 'BIG SPENDER',        desc: 'Own 15 shop items',          ok: () => Object.keys(career.owned).length >= 15 },
+            { id: 'clean', name: 'CLEAN RECORD',       desc: '6 races with no DSQ ever',   ok: () => (career.races || 0) >= 6 && !career.dsqs }
+        ];
+        function checkAch() { career.ach = career.ach || {}; ACH.forEach(a => { if (!career.ach[a.id] && a.ok()) career.ach[a.id] = true; }); }
+        // Called from the podium screen once the result is known
+        function careerAfterRace(pRank, pDsq, ev) {
+            career.races = (career.races || 0) + 1;
+            if (pDsq) career.dsqs = (career.dsqs || 0) + 1;
+            else { if (pRank === 1) career.wins = (career.wins || 0) + 1; if (pRank <= 5) career.top5 = (career.top5 || 0) + 1; }
+            const me = raceRankings.find(r => r.isPlayer);
+            if (me && !pDsq) { career.pb = career.pb || {}; const o = career.pb[ev.tier]; if (!o || me.finishTime < o.t) career.pb[ev.tier] = { t: me.finishTime, name: ev.name }; }
+            const cs = career.contracts, c = cs && cs.active;
+            if (c) {
+                let fail = false;
+                if (c.k === 'PODIUM2') { if (!pDsq && pRank <= 3) c.have++; }
+                else if (c.k === 'TOP5') { if (!pDsq && pRank <= 5) c.have++; }
+                else if (c.k === 'CLEAN') { if (pDsq) fail = true; else c.have++; }
+                else if (c.k === 'WIN') { if (!pDsq && pRank === 1) c.have++; }
+                else if (c.k === 'THROW') { if (pDsq || pRank > 5) c.have = 1; else fail = true; }
+                if (fail) { cs.active = null; career.fans = Math.max(0, (career.fans || 0) - 30); cs.note = '📝 CONTRACT FAILED (-30 FANS)'; }
+                else if (c.have >= CONTRACT_TYPES[c.k].need) { career.cash += c.cash; career.fans = Math.max(0, (career.fans || 0) + c.fans); career.cDone = (career.cDone || 0) + 1; cs.active = null; cs.note = `📝 CONTRACT DONE: +$${c.cash}`; }
+            }
+            checkAch(); saveGame();
+        }
+        function applyLook() {
+            const L = (career && career.look) || {}, p = player();
+            if (L.outfit && p) p.color = L.outfit;
+            const hb = SHOP_ITEMS.find(i => i.id === 'headband'); if (hb) hb.pip = L.band || '#ffffff';
+        }
+        function renderCareer() {
+            checkAch(); const L = career.look = career.look || {};
+            const stl = STAGES.filter(s => s.isStation).map(s => s.type).filter((t, i, a) => a.indexOf(t) === i);
+            const sw = kind => `<button data-look="${kind}" data-col="" class="px-2 h-7 rounded border-2 pixel-font text-[8px] ${!L[kind] ? 'border-white' : 'border-gray-600'}">STD</button>`
+                + ACH.filter(a => a.col).map(a => career.ach[a.id]
+                    ? `<button data-look="${kind}" data-col="${a.col}" title="${a.cn}" class="w-7 h-7 rounded border-2 ${L[kind] === a.col ? 'border-white' : 'border-gray-600'}" style="background:${a.col}"></button>`
+                    : '<span class="w-7 h-7 rounded bg-gray-800 inline-flex items-center justify-center text-[10px]">🔒</span>').join('');
+            const pb = [0, 1, 2, 3].map(t => { const o = (career.pb || {})[t]; return o ? `<div>${o.name}: <b class="text-white">${formatRaceTime(o.t)}</b></div>` : ''; }).join('') || '<div class="text-gray-500">No finishes yet.</div>';
+            document.getElementById('career-body').innerHTML = `
+                <div><div class="pixel-font text-[9px] text-teal-300 mb-1">TROPHIES</div>🥇 ${career.wins || 0} wins · 🏆 ${career.podiums || 0} podiums · ⭐ ${career.top5 || 0} top-5s · 🏁 ${career.races || 0} races · 🚫 ${career.dsqs || 0} DSQ · 👥 ${career.fans || 0} fans</div>
+                <div><div class="pixel-font text-[9px] text-teal-300 mb-1">PERSONAL BESTS</div>${pb}</div>
+                <div><div class="pixel-font text-[9px] text-teal-300 mb-1">STATION PERKS <span class="text-gray-500">(3 races +3%, 8 races +6%)</span></div>
+                    <div class="grid grid-cols-2 gap-x-3">${stl.map(t => { const n = (career.stn || {})[t] || 0; return `<div>${stageLabel(t)}: ${n} <b class="text-yellow-300">${n >= 8 ? '+6%' : n >= 3 ? '+3%' : ''}</b></div>`; }).join('')}</div></div>
+                <div><div class="pixel-font text-[9px] text-teal-300 mb-1">ACHIEVEMENTS</div>${ACH.map(a => `<div class="${career.ach[a.id] ? 'text-white' : 'text-gray-600'}">${career.ach[a.id] ? '✔' : '🔒'} ${a.name} <span class="text-gray-500">${a.desc}${a.cn ? ' → ' + a.cn + ' colour' : ''}</span></div>`).join('')}</div>
+                <div><div class="pixel-font text-[9px] text-teal-300 mb-1">OUTFIT COLOUR</div><div class="flex flex-wrap gap-1.5 items-center">${sw('outfit')}</div>
+                    <div class="pixel-font text-[9px] text-teal-300 mt-2 mb-1">HEADBAND COLOUR <span class="text-gray-500">(needs the Sweat Headband)</span></div><div class="flex flex-wrap gap-1.5 items-center">${sw('band')}</div></div>`;
+        }
+        document.getElementById('career-body').onclick = e => {
+            const b = e.target.closest('[data-look]'); if (!b) return;
+            const L = career.look, p = player(), col = b.dataset.col || null;
+            if (b.dataset.look === 'outfit') { if (!L.base) L.base = p.color; L.outfit = col; p.color = col || L.base; } else L.band = col;
+            applyLook(); sound.playTone(660, 0.05, 'square', 0.05); saveGame(); renderCareer();
+        };
+        document.getElementById('gym-career-btn').onclick = () => { sound.init(); renderCareer(); document.getElementById('career').classList.remove('hidden'); };
+        document.getElementById('career-close').onclick = () => document.getElementById('career').classList.add('hidden');
+
+        // Brand deal income scales with fans (earned from race results) and ladder rank
+        const brandIncome = () => Math.round(40 + (career.fans || 0) * 0.06 + Math.max(0, 9 - playerRank()) * 14);
+
         class RaceEngine {
             constructor() {
                 this.canvas = document.getElementById('race-canvas');
@@ -2393,7 +2899,7 @@
                   const fx = careStatus(ath);
                   const G0 = ath.isPlayer ? career.owned : (ath.gear || {});
                   const sl = !!G0.sleeves;
-                  const mult = fx === 'DOMS' ? (sl ? 0.93 : 0.85) : 1;
+                  const mult = fx === 'DOMS' ? ((ath.isPlayer && career.owned.physio) ? 1 : sl ? 0.93 : 0.85) : 1;   // Team Physio neutralizes DOMS
                   return {
                     ...ath,
                     buff: fx,
@@ -2406,7 +2912,7 @@
                     stageIdx: 0,
                     stageProgress: 0,
                     worldX: 0,
-                    staminaCurrent: Math.min(100, 60 + ath.fitness * 0.4 + (G0.gels ? 10 : 0) + (G0.visor ? 6 : 0)),
+                    staminaCurrent: Math.min(100, 60 + ath.fitness * 0.4 + (G0.gels ? 10 : 0) + (G0.visor ? 6 : 0) + (ath.isPlayer && raceTactics.carb ? 10 : 0)),
                     animFrame: Math.random() * 4,
                     status: 'RACING', // RACING -> FINISHING (past line, walking to corral) -> FINISHED (waiting)
                     event: null,
@@ -2417,7 +2923,9 @@
                     wbMiss: false,
                     wbPenalty: 0,
                     wbCounted: true,
-                    wbStarted: false
+                    wbStarted: false,
+                    strat: ath.isPlayer ? raceTactics.pace : (RIVAL_STRAT[persOf(ath)] || 'BAL'), pers: ath.isPlayer ? null : persOf(ath), caf: !!(ath.isPlayer && raceTactics.caf), bcaa: !!(ath.isPlayer && raceTactics.bcaa),
+                    strained: ath.strain > 0, tac: ath.isPlayer ? { ...raceTactics } : {}, focus: !!(ath.isPlayer && career.owned.focus), meter: (ath.isPlayer && raceTactics.hype) ? 50 : 20, adrUsed: false, adrStage: -1, adrDone: false, exhaustT: 0, talkT: 0, stallT: 0, burstT: 0, holdT: 0, dsq: false
                   };
                 });
                 cameraX = 0;
@@ -2433,6 +2941,7 @@
             advanceStage(r) {
                 const info = this.stageWorldPositions[r.stageIdx];
                 r.worldX = info.endX;
+                if (r.isPlayer && info.isStation) countStation(info.type);
                 r.stageProgress = 0;
                 r.stageIdx++;
 
@@ -2463,6 +2972,7 @@
                 }
 
                 this.runners.forEach(r => {
+                    if (r.status === 'DSQ') return;
                     // --- Racers who have finished: stand in the corral and celebrate ---
                     if (r.status === 'FINISHED') {
                         r.animFrame += 0.1 * simSpeed;
@@ -2497,6 +3007,7 @@
                     if (stage.sprint) speed *= 1.3; // all-out dash to the finish
                     if (r.event === 'CRAMP') speed *= Math.min(0.75, 0.3 + (r.pace / 100) * 0.3); // high PACE = milder cramps
                     if (r.event === 'BOOST') speed *= 1.4;
+                    speed *= tacticMult(r);
                     // Carbon-Plated Racers: +5% on every run leg
                     if (r.gear.shoes && stage.type === 'RUN') speed *= 1.05;
                     if (r.gear.sleeves && stage.isStation) speed *= 1.04;                 // Compression Sleeves
@@ -2504,7 +3015,7 @@
                     // Grip stations: slips cost time; Pro Liquid Chalk cuts both frequency and delay
                     if (['SKIERG', 'ROWER', 'SLED_PULL', 'FARMER', 'ROPE_CLIMB'].includes(stage.type)) {
                         if (r.slip > 0) { speed *= 0.12; r.slip -= simSpeed; }
-                        else if (Math.random() < 0.0012 * Math.max(0.2, 1.5 - r.strength / 100) * (r.gear.chalk ? 0.4 : 1) * simSpeed) {
+                        else if (Math.random() < 0.0012 * Math.max(0.2, 1.5 - r.strength / 100) * (r.gear.chalk ? 0.4 : 1) * (r.tac.elec ? 0.5 : 1) * (raceWeather === 'RAIN' ? 1.8 : 1) * simSpeed) {
                             r.slip = r.gear.chalk ? 18 : 45;
                             if (r.isPlayer) sound.playTone(130, 0.15, 'sawtooth', 0.07);
                         }
@@ -2593,7 +3104,7 @@
                     r.animFrame += animRate * simSpeed;
 
                     // Higher PACE = steadier pacing = slower fatigue build-up over the race
-                    const paceDecay = Math.max(0.004, 0.016 - (r.pace / 100) * 0.01) * (r.gear.vest ? 0.6 : 1) * (r.gear.hydration ? 0.8 : 1); // Compression Vest slows drain
+                    const paceDecay = Math.max(0.004, 0.016 - (r.pace / 100) * 0.01) * (r.gear.vest ? 0.6 : 1) * (r.gear.hydration ? 0.8 : 1) * decayMult(r); // Compression Vest slows drain
                     r.staminaCurrent = Math.max(20, r.staminaCurrent - paceDecay * simSpeed);
 
                     leaderX = Math.max(leaderX, r.worldX);
@@ -2611,7 +3122,7 @@
                 if (cameraX < 0) cameraX = 0;
 
                 // Race only ends once EVERY racer has crossed the line and reached the corral
-                if (this.runners.every(r => r.status === 'FINISHED')) {
+                if (this.runners.every(r => r.status === 'FINISHED' || r.status === 'DSQ')) {
                     document.getElementById('event-banner').classList.add('hidden');
                     this.endTimer += 0.016;
                     if (this.endTimer > 2.5) {
@@ -2633,7 +3144,9 @@
 
                 // Higher PACE = steadier pacing = much less likely to cramp or pick up an injury
                 let crampChance = Math.max(0.08, 0.55 - (runner.pace / 100) * 0.5);
-                if (runner.buff === 'FRESH') crampChance *= 0.5; // Fresh Legs: lower cramp chance
+                if (runner.buff === 'FRESH') crampChance *= 0.5;
+                if (runner.bcaa) crampChance *= 0.4;
+                if (runner.tac.heat && runner.stageIdx < STAGES.length / 2) crampChance = 0; // Fresh Legs: lower cramp chance
                 const evt = (Math.random() < crampChance)
                     ? { name: 'CRAMP SURGE!', type: 'CRAMP' }
                     : (Math.random() < 0.5
@@ -2833,6 +3346,7 @@
             }
 
             updateHUD() {
+                updateTactics(); drawWeather(this.ctx);
                 const crossed = raceRankings.length;
                 const total = this.runners.length;
 
@@ -2952,12 +3466,19 @@
             // Season points + prize money
             const gained = {};
             raceRankings.forEach((r, i) => {
-                gained[r.id] = Math.round((BASE_POINTS[i] || 1) * ev.mult);
+                gained[r.id] = r.dsq ? 0 : Math.round((BASE_POINTS[i] || 1) * ev.mult);
                 career.points[r.id] = (career.points[r.id] || 0) + gained[r.id];
             });
             const pRank = raceRankings.findIndex(r => r.isPlayer) + 1;
-            const prize = Math.round((PRIZES[pRank] || 0) * (ev.prize || 1));
+            const pDsq = raceRankings.some(r => r.isPlayer && r.dsq);
+            const prize = pDsq ? 0 : Math.round((PRIZES[pRank] || 0) * (ev.prize || 1));
             career.cash += prize;
+            career.cash = Math.max(0, career.cash - (raceRankings.some(r => r.isPlayer && r.bribeUsed) ? 150 : 0));
+            career.fans = Math.max(0, (career.fans || 0) + (pDsq ? -50 : Math.round(Math.max(0, 11 - pRank) * 20 * ev.mult * (1 + 0.1 * ['trophy', 'neon', 'mascot'].filter(k => career.owned[k]).length))));
+            if (!pDsq && pRank >= 1 && pRank <= 3) career.podiums = (career.podiums || 0) + 1;
+            const nemR = raceRankings.find(r => r.id === nemesisId());
+            if (nemR && !pDsq && !nemR.dsq && pRank < raceRankings.indexOf(nemR) + 1) { career.fans += Math.round(40 * ev.mult); career.nemWins = (career.nemWins || 0) + 1; }
+            careerAfterRace(pRank, pDsq, ev);
             career.done[ev.key] = true;
             career.lastEvent = ev.key;
             saveGame();
@@ -2967,7 +3488,7 @@
             document.getElementById('podium-sub').innerText = ev.name + ' · RESULTS';
             document.getElementById('prize-box').innerHTML = prize > 0
                 ? `<div class="bg-emerald-900/60 border-2 border-emerald-400 rounded p-2 text-emerald-300">💰 ${ordinal(pRank)} PLACE PRIZE: +$${prize} · WALLET $${career.cash}</div>`
-                : `<div class="bg-gray-900 border border-gray-700 rounded p-2 text-gray-400">YOU FINISHED ${ordinal(pRank)} · NO PRIZE MONEY (TOP 5 ONLY)</div>`;
+                : `<div class="bg-gray-900 border border-gray-700 rounded p-2 text-gray-400">${pDsq ? '🚫 DISQUALIFIED FOR FOUL PLAY · 0 PTS, NO PRIZE' : 'YOU FINISHED ' + ordinal(pRank) + ' · NO PRIZE MONEY (TOP 5 ONLY)'}</div>`;
 
             const rk = playerRank();
             let note;
@@ -2985,7 +3506,7 @@
                 const medal = i === 0 ? "text-yellow-300" : (i === 1 ? "text-gray-300" : (i === 2 ? "text-amber-600" : "text-gray-400"));
                 row.innerHTML = `
                     <span><span class="${medal} font-bold">#${i + 1}</span> <span style="color:${r.color}">${r.name}</span></span>
-                    <span class="text-gray-300">${formatRaceTime(r.finishTime)} <span class="text-yellow-300">+${gained[r.id]}</span></span>
+                    <span class="text-gray-300">${r.dsq ? 'DSQ' : formatRaceTime(r.finishTime)} <span class="text-yellow-300">+${gained[r.id]}</span></span>
                 `;
                 box.appendChild(row);
             });
@@ -3003,7 +3524,7 @@
             if (isRacing) animFrameId = requestAnimationFrame(gameLoop);
         }
 
-        function startRace() {
+        function launchRace() {
             if (!career || !todaysEvent()) return;
             raceEntrants = getEntrants();
             sound.init();
@@ -3018,6 +3539,7 @@
         }
 
         function finishRace() {
+            engine.runners.filter(r => r.status === 'DSQ').forEach(r => { r.finishTime = 0; r.rank = raceRankings.length + 1; raceRankings.push(r); });
             isRacing = false;
             sound.stopBGM();
             if (animFrameId) cancelAnimationFrame(animFrameId);
